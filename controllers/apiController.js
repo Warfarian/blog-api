@@ -1,7 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient()
-const {v4:uuid} = require('uuidv4');
-const bcrypt = require("bcryptjs");
+
 
 async function getAllPosts(req,res) {
     const allPosts = await prisma.posts.findMany();
@@ -9,22 +8,39 @@ async function getAllPosts(req,res) {
 }
 
 async function getAllComments(req,res) {
-    
+    try{
+        const allComments = await prisma.comments.findMany({})
+        res.json(allComments);
+    }catch(err){
+        console.error("Error fetching all comments", err)
+    }
 }
 
 async function addPosts(req,res) {
+    const { username,title,content } = req.body;
+    try{
+        const userId = await prisma.user.findUnique({
+            where: {
+                username: username
+            }
+        })
+        
+    }catch(err) {console.error('error finding userId to add posts',err.message)}
+    try{
     const postToAdd = await prisma.posts.create({
-
+        authorId: userId,
+        title: title,
+        content: content
     })
-    //   postId Int @id @unique @default(autoincrement())
-    //   authorId String 
-    //   author User @relation(fields: [authorId], references: [userId])
-    //   title String  @default("Just a chill guy post")
-    //   content String @default("lorem ipsum dolor")
-    //   comments Comments[] 
+    console.log("Successfully added post");
+    res.json(postToAdd)
+} catch(err){
+        console.error('Error adding posts',err);
+    }
 }
 
 async function deletePosts(req,res) {
+    
     const deletePost = await prisma.posts.delete({
         where: {
             // postId
@@ -32,27 +48,22 @@ async function deletePosts(req,res) {
     })
 }
 
+async function updatePost(req,res) {
+    
+}
+
 async function getAllUsers(req,res) {
-    const allUsers = await prisma.user.findMany();
-    res.json(allUsers);
+    try{
+        const allUsers = await prisma.user.findMany();
+        res.json(allUsers);
+    }
+    catch(err){
+        console.error('Error fetching all users', err);
+    }
 }
 
-async function addUser(req,res) {
-    const userId = uuid();
-    const {title, content , username, author, password} = req.body;
-    const hash = bcrypt.hash(password, 10, (err, hashedPassword) => {
-        if (err) {
-          console.error(err);
-        } 
-      });
-    const addUser = await prisma.user.create({
-        userId: userId,
-        username: username,
-        author: author,
-        password: hash,
-        title: title,
-        content: content
-    })
+async function addComments(req,res) {
+    
 }
 
-module.exports = { addUser, getAllComments, getAllPosts,getAllUsers, addPosts, deletePosts }
+module.exports = { updatePost, getAllComments,addComments, getAllPosts,getAllUsers, addPosts, deletePosts }

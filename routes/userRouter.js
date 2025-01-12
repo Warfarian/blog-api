@@ -4,6 +4,4 @@ const apiController = require("../controllers/apiController")
 
 userRouter.get('/', apiController.getAllUsers)
 
-userRouter.post('/', apiController.addUser)  
-
 module.exports = userRouter

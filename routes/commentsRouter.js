@@ -1,17 +1,14 @@
 const { Router } = require("express")
 const commentsRouter = Router();
+const apiController = require('../controllers/apiController')
 
 const comments = {
     commentId : 1,
     post : 1
 }
 
-commentsRouter.get('/', (req,res)=>{
-    res.json(comments) 
- })
+commentsRouter.get('/', apiController.getAllComments)
  
- commentsRouter.post('/', (req,res)=>{
-     res.json()
- })  
+ commentsRouter.post('/', apiController.addComments)  
 
  module.exports = commentsRouter;

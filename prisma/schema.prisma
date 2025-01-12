@@ -10,10 +10,21 @@ datasource db {
 
 model User {
   userId String @unique @id
-  username String @default("guest")
+  username String @unique
   author Boolean @default(false)
   password String
   posts Posts[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [userId])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  isValid   Boolean  @default(true)
 }
 
 model Posts {
